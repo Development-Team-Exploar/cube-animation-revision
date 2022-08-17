@@ -260,6 +260,7 @@ scene.onPointerDown = function(event){
 }
 
 function animateCubeRotation(angle, meshToAnimate) {
+    console.log('animate in');
     animateCube = false
     clearTimeout(autoRotateTimeout)
     pointerUpAnimating = true
@@ -293,10 +294,11 @@ function animateCubeRotation(angle, meshToAnimate) {
     }, 1500)
     .easing(TWEEN.Easing.Cubic.InOut)
     .start();
-
-    setTimeout(() => {
-        animateCubeFace = false
-    }, 2100);
+    tweenAnimation.onComplete(()=>{
+        autoRotateTimeout = setTimeout(() => {
+            animateCubeFace = false
+        }, 250);
+    })
 }
 
 scene.onPointerUp = function () {
@@ -321,8 +323,9 @@ scene.onPointerUp = function () {
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
         if (pickResult.hit && !isDragging) {
+            console.log(lastAnimatedMesh?.scaling.y.toFixed(2), lastAnimatedMesh);
             
-            if((lastAnimatedMesh?.scaling.y == 1 || lastAnimatedMesh == undefined)) {
+            if((lastAnimatedMesh?.scaling.y.toFixed(2) == 1 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
                 animateCubeFace = true
                 toAnimate = true
@@ -396,7 +399,6 @@ scene.onPointerUp = function () {
                         rightImg.video.muted = true
                         pointerUpAnimating = false
                         animateCubeFace = false
-                        console.log(animateCube,pointerUpAnimating,animateCubeFace);
                     }, 250);
                 })
             }
