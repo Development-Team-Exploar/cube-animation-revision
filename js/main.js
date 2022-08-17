@@ -372,10 +372,12 @@ scene.onPointerUp = function () {
                     .start();
                     tweenAnimation.onComplete(()=>{
                         autoRotateTimeout = setTimeout(() => {
-                            animateCube = true
-                            rightImg.video.muted = true
-                            pointerUpAnimating = false
-                            animateCubeFace = false
+                            if(lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
+                                animateCube = true
+                                rightImg.video.muted = true
+                                pointerUpAnimating = false
+                                animateCubeFace = false
+                            }
                         }, 250);
                     })
                 }
@@ -395,10 +397,12 @@ scene.onPointerUp = function () {
                 .start();
                 tweenAnimation.onComplete(()=>{
                     autoRotateTimeout = setTimeout(() => {
-                        animateCube = true
-                        rightImg.video.muted = true
-                        pointerUpAnimating = false
-                        animateCubeFace = false
+                        if(lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
+                            animateCube = true
+                            rightImg.video.muted = true
+                            pointerUpAnimating = false
+                            animateCubeFace = false
+                        }
                     }, 250);
                 })
             }
