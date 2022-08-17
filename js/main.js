@@ -15,7 +15,6 @@ const sizes = {
 }
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
-    adaptToDeviceRatio: true,
     antialias: true
 }); // Generate the BABYLON 3D engine
 
@@ -34,28 +33,16 @@ const leftBigImg = document.getElementById('left-image');
 const video = document.getElementById('video');
 const bgContainer = document.getElementById('bgContainer');
 
-let mouseX, scene = null, cubeModel = null, isMouseDown = false, isDragging = false, cubeFaceMat = false, rotation = 0, step = (Math.PI/4.00), envVolume = 0.03, gl = null, gl2 = null;
+let mouseX, scene = null, cubeModel = null, isMouseDown = false, isDragging = false, cubeFaceMat = false, gl = null, gl2 = null;
 
-let meshArrayGlow = [],
-meshArrayGlow2 = [],
-meshArrayNotGlow = [],
-materialsToAnimate = [],
-cubeMesh = null,
-animateCube = false,
+let animateCube = false,
 animateCubeFace = false,
-oldCubeRotation = 0,
-oldCubeRotationStep = 0,
-clickableMeshes = [],
-mirror = null,
-mirrorOverlayPlane = null,
-lightBelowCube = null
+clickableMeshes = []
 
 let pointerUpAnimating = false,
-lastAnimatedMesh = null
+lastAnimatedMesh = null,
+camera;
 
-let timePointerDown, timePointerUp, camera;
-
-let hasDragEnded = true;
 // Add your code here matching the playground format
 const createScene = function () {
     let loaderTimer = null, babylonLoader = null
@@ -83,10 +70,6 @@ const createScene = function () {
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
         scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
-        // scene.meshes[0].scaling = new BABYLON.Vector3(1, 1, 1);       
-        if(document.body.classList.contains('isMobile')) {
-            scene.meshes[0].scaling = new BABYLON.Vector3(.6, .6, .6);
-        }
         scene.meshes[0].position = new BABYLON.Vector3(0,-0.01,0);
         gl.customEmissiveColorSelector = function(element, subMesh, material, result) {
             if (element.name === "White edge") {
@@ -99,16 +82,6 @@ const createScene = function () {
             }
         }
         scene.meshes.forEach(element => {
-            if(element.name == 'Green_edge' || element.name == 'White_edge') {
-                meshArrayGlow.push(element)
-                    
-            }else {
-                meshArrayNotGlow.push(element)
-            }
-            if(element.name == 'concrete_floor')
-                element.isVisible = false
-            if(element.name == 'Plane')
-                element.isVisible = false
             if(element.name == 'front' || element.name == 'Right' || element.name == 'back' || element.name == 'left') {
                 if(element.name == 'front') {
                     const data = {
@@ -200,89 +173,14 @@ const createScene = function () {
         scene.getMaterialByName('Material.008')._albedoTexture = backImg;
         scene.getMaterialByName('Material.008').roughness = 0.15
         
-        if(document.body.classList.contains('isMobile')) {
-            // lightBelowCube = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(-7.5, 0, 0), new BABYLON.Vector3(8, -8, 0), Math.PI / 2, 20, scene);
-            // lightBelowCube.intensity = 0.7;
-        }else {
-            // lightBelowCube = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(-4, 0, 0), new BABYLON.Vector3(8, -8, 0), Math.PI / 2, 20, scene);
-            // lightBelowCube.intensity = 0.5;
-        }
-        
-        cubeMesh = scene.getMeshByName("Cube");
-        // Mirror
-        // mirror = BABYLON.Mesh.CreateBox("Mirror", 1.0, scene);
-        // mirror.scaling = new BABYLON.Vector3(500.0, 1, 500.0);
-        // mirror.material = new BABYLON.StandardMaterial("mirror", scene);
-        // // mirror.material.color = new BABYLON.Color3.FromHexString("#000000");
-        // mirror.material.color = new BABYLON.Color3(0.07, 0.13, 0.2);
-        // mirror.material.emissiveColor = new BABYLON.Color3(0.07, 0.13, 0.2);
-        // // mirror.material.emissiveIntensity = 0.4;
-        // mirror.material.reflectionTexture = new BABYLON.MirrorTexture("mirror", {ratio: 1}, scene, true);
-        // if(document.body.classList.contains('isMobile')) {
-        //     mirror.material.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1.0, 0, -.26);
-        // }else {
-        //     mirror.material.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1.0, 0, -.46);
-        // }
-        // mirror.material.reflectionTexture.renderList = meshArrayNotGlow.concat(meshArrayGlow);
-        // mirror.material.reflectionTexture.level = 0.5;
-        // mirror.material.reflectionTexture.adaptiveBlurKernel = 24;
-        // // mirror.material.specularColor = new BABYLON.Color3(0, 0, 0);
-        // mirror.material.specularColor = new BABYLON.Color3(0.07, 0.13, 0.2);
-        // mirror.material.specularTexture = new BABYLON.Texture("./assets/Seamless_Concrete_Floor_Texture_NORMAL.jpg", scene);
-        // mirror.material.specularTexture.uScale = 16;
-        // mirror.material.specularTexture.vScale = 16;
-        // mirror.position = new BABYLON.Vector3(0, -1, 0);
-        // mirror.environmentIntensity = 0	
-        // mirror.material.hasAlpha = true
-        // mirror.material.alpha = 0.3
-        // gl.addExcludedMesh(mirror);
-        // materialsToAnimate.push(mirror.material)
-        
-        // mirrorOverlayPlane = BABYLON.Mesh.CreateBox("ground", 1.0, scene);
-        // mirrorOverlayPlane.scaling = new BABYLON.Vector3(500.0, .1, 500.0);
-        // if(document.body.classList.contains('isMobile')) {
-        //     mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.4, 0);
-        // }else {
-        //     mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.5, 0);
-        // }
-        // mirrorOverlayPlane.rotation.y = -Math.PI/2
-        
-        // var pbr = new BABYLON.StandardMaterial("pbr", scene);
-        // mirrorOverlayPlane.material = pbr;
-
-        // pbr.diffuseTexture = new BABYLON.Texture("./assets/concrete-polished.jpg", scene);
-        // pbr.diffuseTexture.uScale = 32;
-        // pbr.diffuseTexture.vScale = 32;
-        // pbr.specularTexture = new BABYLON.Texture("./assets/concrete-polished.jpg", scene);
-        // pbr.specularTexture.uScale = 32;
-        // pbr.specularTexture.vScale = 32;
-        // pbr.specularColor = new BABYLON.Color3(0.07, 0.13, 0.2);
-        // pbr.emissiveColor = new BABYLON.Color3(0.07, 0.13, 0.2);
-        // pbr.metallic = 0.5;
-        // pbr.roughness = 0.4;
-        // pbr.hasAlpha = true
-        // pbr.alpha = 0.1
-        // pbr.environmentIntensity = 0
-        // // Main material	
-
-        // // Fog
-        // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-        // scene.fogColor = scene.clearColor;
-        // scene.fogStart = 30.0;
-        // scene.fogEnd = 130.0;
-        
         //check device orientation
         if(document.body.classList.contains('isMobile')){
             if(sizes.width / sizes.height >= 1) {
                 
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05,1.05,1.05);
-                // mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.8, 0);
-                // mirror.material.reflectionTexture.mirrorPlane.d = -.4
             }else if(sizes.width / sizes.height <= 1) {
     
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58,.58,.58);
-                // mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.4, 0);
-                // mirror.material.reflectionTexture.mirrorPlane.d = -.26
             }
         }
     });
@@ -290,7 +188,6 @@ const createScene = function () {
 
     loaderTimer = setInterval(() => {
         if (babylonLoader != null) {
-            console.log('Model Loaded');
             document.getElementById("loader-ui").style.display = "none";
             clearInterval(loaderTimer)
         }
@@ -301,10 +198,10 @@ const createScene = function () {
     camera.lowerBetaLimit = c;
     camera.upperBetaLimit = c;
 
-    camera.idleRotationWaitTime = 6000;
-    camera.panningAxis = new BABYLON.Vector3(0,0,0);
-    camera.angularSensibilityX = 10000;
-    camera.angularSensibilityY = 10000;
+    // camera.idleRotationWaitTime = 6000;
+    // camera.panningAxis = new BABYLON.Vector3(0,0,0);
+    // camera.angularSensibilityX = 10000;
+    // camera.angularSensibilityY = 10000;
 
     // camera.attachControl(canvas, true);
     // camera.inputs.remove(camera.inputs.attached.mousewheel);
@@ -326,11 +223,11 @@ let totalAnimCount = 0
 
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
-
+    // console.log(engine.getDeltaTime());
     TWEEN.update();
 
     if(cubeModel && animateCube){
-        cubeModel.rotation.y += 0.002
+        cubeModel.rotation.y += (0.0004 * engine.getDeltaTime())
     }
 
     scene.render();
@@ -363,10 +260,10 @@ scene.onPointerDown = function(event){
 }
 
 function animateCubeRotation(angle, meshToAnimate) {
-    console.log('animate in');
+    animateCube = false
+    clearTimeout(autoRotateTimeout)
     pointerUpAnimating = true
     let rotateAngle = angle
-    const direction = angle/Math.abs(angle)
     let cycles = Math.floor(cubeModel.rotation.y/(2*Math.PI))
     if(angle == 0) {
         const cubeTempAngle = cubeModel.rotation.y%(2*Math.PI)
@@ -399,7 +296,6 @@ function animateCubeRotation(angle, meshToAnimate) {
 
     setTimeout(() => {
         animateCubeFace = false
-        console.log(animateCubeFace);
     }, 2100);
 }
 
@@ -459,6 +355,7 @@ scene.onPointerUp = function () {
                     lastAnimatedMesh = meshToAnimate
                 }
             }else {
+                // if(lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
                 if(lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
                     console.log('animate out inside pick');
                     animateCubeFace = true
@@ -470,17 +367,19 @@ scene.onPointerUp = function () {
                     }, 1500)
                     .easing(TWEEN.Easing.Cubic.InOut)
                     .start();
-                    autoRotateTimeout = setTimeout(() => {
-                        animateCube = true
-                        rightImg.video.muted = true
-                        pointerUpAnimating = false
-                        animateCubeFace = false
-                    }, 1500);
+                    tweenAnimation.onComplete(()=>{
+                        autoRotateTimeout = setTimeout(() => {
+                            animateCube = true
+                            rightImg.video.muted = true
+                            pointerUpAnimating = false
+                            animateCubeFace = false
+                        }, 250);
+                    })
                 }
             }
 
         }else {
-            if((lastAnimatedMesh.scaling.y != 1) && !animateCubeFace) {
+            if((lastAnimatedMesh.scaling.y != 1)) {
                 console.log('animate out outside pick');
                 animateCubeFace = true
                 tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
@@ -491,13 +390,15 @@ scene.onPointerUp = function () {
                 }, 1500)
                 .easing(TWEEN.Easing.Cubic.InOut)
                 .start();
-                autoRotateTimeout = setTimeout(() => {
-                    animateCube = true
-                    rightImg.video.muted = true
-                    pointerUpAnimating = false
-                    animateCubeFace = false
-                    console.log(animateCube,pointerUpAnimating,animateCubeFace);
-                }, 1500);
+                tweenAnimation.onComplete(()=>{
+                    autoRotateTimeout = setTimeout(() => {
+                        animateCube = true
+                        rightImg.video.muted = true
+                        pointerUpAnimating = false
+                        animateCubeFace = false
+                        console.log(animateCube,pointerUpAnimating,animateCubeFace);
+                    }, 250);
+                })
             }
         }
 
@@ -510,13 +411,15 @@ scene.onPointerUp = function () {
 }
 
 function idlBehav() {
-    animateCube = true
+    if((lastAnimatedMesh?.scaling?.y == 1 || lastAnimatedMesh?.scaling?.y == undefined)) {
+        animateCube = true
+    }
 }
 
 let moveIdleTimer = null
 
 scene.onPointerMove = function(event){
-    if(camera.radius == 15 && !isDragging) {
+    if(!isDragging) {
         clearTimeout(moveIdleTimer)
         moveIdleTimer = setTimeout(idlBehav, 2000);
     }
@@ -600,8 +503,6 @@ scene.onPointerMove = function(event){
     mouseX = event.offsetX;
 
 }
-
-
 const checkObjectSizePositions = () => {
     checkMobile()
     sizes.width = window.innerWidth;
@@ -614,23 +515,15 @@ const checkObjectSizePositions = () => {
     if(scene != null && cubeModel != null) {
         if(document.body.classList.contains('isMobile')){
         
-            // lightBelowCube.position.x = -7.5
             if(sizes.width / sizes.height >= 1) {
                 
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05,1.05,1.05);
-                // mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.8, 0);
-                // mirror.material.reflectionTexture.mirrorPlane.d = -.4
             }else if(sizes.width / sizes.height <= 1) {
 
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58,.58,.58);
-                // mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.4, 0);
-                // mirror.material.reflectionTexture.mirrorPlane.d = -.26
             }
         }else {
             scene.meshes[0].scaling = new BABYLON.Vector3(1.025,1.025,1.025);
-            // mirrorOverlayPlane.position = new BABYLON.Vector3(0, -1.5, 0);
-            // mirror.material.reflectionTexture.mirrorPlane.d = -.49
-            // lightBelowCube.position.x = -4
         }
     }
 }
