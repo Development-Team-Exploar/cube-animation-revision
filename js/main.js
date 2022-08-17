@@ -227,7 +227,7 @@ engine.runRenderLoop(function () {
     TWEEN.update();
 
     if(cubeModel && animateCube){
-        cubeModel.rotation.y += (0.0004 * engine.getDeltaTime())
+        cubeModel.rotation.y += (0.00025 * engine.getDeltaTime())
     }
 
     scene.render();
