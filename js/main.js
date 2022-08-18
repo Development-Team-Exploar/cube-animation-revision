@@ -15,6 +15,7 @@ const sizes = {
 }
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
+    // adaptToDeviceRatio: true, //To be commented and versions created for performance check
     antialias: true
 }); // Generate the BABYLON 3D engine
 
@@ -252,6 +253,7 @@ let autoRotateTimeout = null
 let gsapAnimate = null
 let tweenAnimation = null
 let toAnimate = false
+let moveIdleTimer = null
 
 scene.onPointerDown = function(event){
     isMouseDown = true
@@ -325,7 +327,7 @@ scene.onPointerUp = function () {
         if (pickResult.hit && !isDragging) {
             console.log(lastAnimatedMesh?.scaling.y.toFixed(2), lastAnimatedMesh);
             
-            if((lastAnimatedMesh?.scaling.y.toFixed(2) == 1 || lastAnimatedMesh == undefined)) {
+            if((lastAnimatedMesh?.scaling.y.toFixed(2) <= 1.12 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
                 animateCubeFace = true
                 toAnimate = true
@@ -375,6 +377,8 @@ scene.onPointerUp = function () {
                             if(lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
                                 animateCube = true
                                 rightImg.video.muted = true
+                                rightImg.video.currentTime = 0
+                                rightImg.video.paused = true
                                 pointerUpAnimating = false
                                 animateCubeFace = false
                             }
@@ -384,7 +388,7 @@ scene.onPointerUp = function () {
             }
 
         }else {
-            if((lastAnimatedMesh.scaling.y != 1)) {
+            if((lastAnimatedMesh?.scaling?.y != 1) && lastAnimatedMesh != undefined) {
                 console.log('animate out outside pick');
                 animateCubeFace = true
                 tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
@@ -400,6 +404,8 @@ scene.onPointerUp = function () {
                         if(lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
                             animateCube = true
                             rightImg.video.muted = true
+                            rightImg.video.currentTime = 0
+                            rightImg.video.paused = true
                             pointerUpAnimating = false
                             animateCubeFace = false
                         }
@@ -409,9 +415,9 @@ scene.onPointerUp = function () {
         }
 
     }
-
-    if(rightImg) {
-        rightImg.video.play();
+    if(!isDragging) {
+        clearTimeout(moveIdleTimer)
+        moveIdleTimer = setTimeout(idlBehav, 1000);
     }
 
 }
@@ -422,12 +428,11 @@ function idlBehav() {
     }
 }
 
-let moveIdleTimer = null
 
 scene.onPointerMove = function(event){
     if(!isDragging) {
         clearTimeout(moveIdleTimer)
-        moveIdleTimer = setTimeout(idlBehav, 2000);
+        moveIdleTimer = setTimeout(idlBehav, 1000);
     }
 
     if(isMouseDown) {
