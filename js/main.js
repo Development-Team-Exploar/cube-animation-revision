@@ -44,6 +44,9 @@ let pointerUpAnimating = false,
 lastAnimatedMesh = null,
 camera;
 
+let gsapAnimate = null,
+gsapAnimateCompletion = false
+
 // Add your code here matching the playground format
 const createScene = function () {
     let loaderTimer = null, babylonLoader = null
@@ -230,6 +233,12 @@ engine.runRenderLoop(function () {
     if(cubeModel && animateCube){
         cubeModel.rotation.y += (0.00025 * engine.getDeltaTime())
     }
+    if(gsapAnimateCompletion && !animateCube) {
+        setTimeout(() => {
+            idlBehav()
+        }, 500);
+    }
+    // console.log(gsapAnimateCompletion);
 
     scene.render();
 });
@@ -250,7 +259,6 @@ let x = 0.0;
 let easing = 0.01;
 let modelRotation = 0
 let autoRotateTimeout = null
-let gsapAnimate = null
 let tweenAnimation = null
 let toAnimate = false
 let moveIdleTimer = null
@@ -325,7 +333,6 @@ scene.onPointerUp = function () {
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
         if (pickResult.hit && !isDragging) {
-            console.log(lastAnimatedMesh?.scaling.y.toFixed(2), lastAnimatedMesh);
             
             if((lastAnimatedMesh?.scaling.y.toFixed(2) <= 1.12 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
@@ -415,22 +422,19 @@ scene.onPointerUp = function () {
         }
 
     }
-    if(!isDragging) {
-        clearTimeout(moveIdleTimer)
-        moveIdleTimer = setTimeout(idlBehav, 1000);
-    }
 
 }
 
 function idlBehav() {
-    if((lastAnimatedMesh?.scaling?.y == 1 || lastAnimatedMesh?.scaling?.y == undefined)) {
+    if((lastAnimatedMesh?.scaling?.y == 1 || lastAnimatedMesh?.scaling?.y == undefined) && (gsapAnimateCompletion == true)) {
+        console.log('start');
         animateCube = true
     }
 }
 
 
 scene.onPointerMove = function(event){
-    if(!isDragging) {
+    if(!isDragging && (gsapAnimateCompletion == true)) {
         clearTimeout(moveIdleTimer)
         moveIdleTimer = setTimeout(idlBehav, 1000);
     }
@@ -459,8 +463,10 @@ scene.onPointerMove = function(event){
             },
             {
                 y: modelRotation,
-                duration: 2,
-                ease: "Expo.easeOut"
+                duration: 2.2,
+                ease: "Power4.easeOut",
+                onStart: function(){ gsapAnimateCompletion = false },
+                onComplete: function(){ gsapAnimateCompletion = true }
                 // ease: "power4.out"
             }
         )
