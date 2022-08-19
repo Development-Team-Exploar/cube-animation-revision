@@ -154,6 +154,7 @@ const createScene = function () {
         let frontImg = new BABYLON.Texture("./assets/front-img.png", scene);
         rightImg = new BABYLON.VideoTexture("video", "./assets/right-video.mp4", scene, true);
         rightImg.video.muted = true;
+        rightImg.fl
         let leftImg = new BABYLON.Texture("./assets/left-img.jpg", scene);
         let backImg = new BABYLON.Texture("./assets/back-img.png", scene);
 
@@ -348,6 +349,7 @@ scene.onPointerUp = function () {
                     angle = Math.PI/2
                     rightImg.video.currentTime = 0
                     rightImg.video.muted = false
+                    rightImg.video.play();
                 }else if(clickedMeshName === "back"){//back panel
                     meshToAnimate = scene.getMeshByName("image cube_primitive3")
                     toAnimateCamera = true
@@ -382,10 +384,11 @@ scene.onPointerUp = function () {
                     tweenAnimation.onComplete(()=>{
                         autoRotateTimeout = setTimeout(() => {
                             if(lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
+                                console.log(lastAnimatedMesh?.scaling.y.toFixed(2));
                                 animateCube = true
                                 rightImg.video.muted = true
                                 rightImg.video.currentTime = 0
-                                rightImg.video.paused = true
+                                rightImg.video.pause();
                                 pointerUpAnimating = false
                                 animateCubeFace = false
                             }
@@ -412,7 +415,7 @@ scene.onPointerUp = function () {
                             animateCube = true
                             rightImg.video.muted = true
                             rightImg.video.currentTime = 0
-                            rightImg.video.paused = true
+                            rightImg.video.pause();
                             pointerUpAnimating = false
                             animateCubeFace = false
                         }
