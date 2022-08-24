@@ -1,0 +1,194 @@
+
+#renderCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Montserrat", sans-serif;
+    // overflow: hidden;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+}
+  
+#domContentContainer {
+    pointer-events: none;
+}
+  
+#bgContainer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    // width: 800px;
+    // margin: 0 auto;
+    // background: url("../assets/glb/Gray\ _BG.jpeg") no-repeat;
+    // background-size: cover;
+    // background: #0F2D4C ;
+    // background: linear-gradient(180deg, rgb(0, 0, 0) 40%, #0F2D4C 100%);
+    // background: transparent;
+    background: #0F2D4C ;
+    background: linear-gradient(180deg, rgb(0, 0, 0) 40%, #0F2D4C 100%);
+    overflow: hidden;
+  
+    #light-bulb {
+      position: absolute;
+      top: -10%;
+      left: 0;
+      width: 80vh;
+      height: 80vh;
+      opacity: 0.4;
+      z-index: -1;
+      transition: top 10s ease-in-out, left 10s ease-in-out;
+  
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        border-radius: 50%;
+        border-radius: 50%;
+        // background: rgb(198, 36, 114);
+        // background: rgb(36,74,198);
+        // background: radial-gradient(circle, rgba(36,74,198,1) 7%, rgba(36,74,198,0.8) 20%, rgba(36,74,198,0.72) 32%, rgba(36,74,198,0.65) 35%, rgba(36,74,198,0.45) 45%, rgba(36,74,198,0.25) 55%, rgba(36,74,198,0.1) 65%, rgba(36,74,198,0) 70%);
+        filter: blur(30px);
+        opacity: 0.85;
+        transition: top 10s ease-in-out, left 10s ease-in-out;
+        // animation: gradientAnimation 24s infinite alternate-reverse ease-in-out;
+  
+      }
+    }
+}
+
+
+//Loader from SmartData
+
+.loader-wrapper {
+  position: fixed;
+  z-index: 223;
+  width: 100%;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  background-color: #000000a1;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+$dot-count: 26;
+$dot-size: 10px;
+$dot-space: 15px;
+$dot-start: (($dot-count / 2 + 1) * ($dot-size + $dot-space)) / 2;
+
+$animation-time: 2s;
+$animation-distance: 25px;
+
+.loader {
+  position: relative;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  transform: rotate(90deg);
+
+  .dot {
+    animation-name: movement;
+    animation-duration: $animation-time;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    height: $dot-size;
+    position: absolute;
+    top: -#{$dot-size};
+    transform: translate3d(0, -#{$animation-distance}, 0) scale(1);
+    width: $dot-size;
+
+    @for $i from 1 through $dot-count {
+      $dot-move: ceil($i / 2);
+      $dot-pos: $dot-start - (($dot-size + $dot-space) * $dot-move);
+
+      $animation-delay: -#{$i * .1}s;
+
+      @if $i % 2==0 {
+        $animation-delay: -#{($i * .1) + ($animation-time / 2)};
+      }
+
+      &:nth-of-type(#{$i}) {
+        animation-delay: $animation-delay;
+        left: $dot-pos;
+
+        &::before {
+          animation-delay: $animation-delay;
+        }
+      }
+    }
+
+    &::before {
+      animation-name: size-opacity;
+      animation-duration: $animation-time;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease;
+      background: white;
+      border-radius: 50%;
+      content: '';
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+
+    &:nth-of-type(even)::before {
+      background-color: #1d6ab3;
+      box-shadow: inset 0 0 4px darken(#1d6ab3, 10%);
+    }
+  }
+}
+
+@keyframes movement {
+  0% {
+    transform: translate3d(0, -#{$animation-distance}, 0);
+    z-index: 0;
+  }
+
+  50% {
+    transform: translate3d(0, #{$animation-distance}, 0);
+    z-index: 10;
+  }
+
+  100% {
+    transform: translate3d(0, -#{$animation-distance}, 0);
+    z-index: -5;
+  }
+}
+
+@keyframes size-opacity {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.5);
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: .35;
+    transform: scale(.5);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
