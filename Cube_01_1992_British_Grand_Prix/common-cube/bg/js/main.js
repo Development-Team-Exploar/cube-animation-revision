@@ -155,8 +155,8 @@ const createScene = function () {
         rightImg = new BABYLON.VideoTexture("video", "./assets/right-video.mp4", scene, false, false);
         rightImg.video.muted = true;
         rightImg.fl;
-        // rightImg.uScale = -1
-        // rightImg.vScale = -1
+        //rightImg.uScale = -1
+        //rightImg.vScale = -1
         let leftImg = new BABYLON.Texture("./assets/left-img.jpg", scene, false, false);
         leftImg.uScale = -1;
         let backImg = new BABYLON.Texture("./assets/back-img.jpg", scene, false, false);
