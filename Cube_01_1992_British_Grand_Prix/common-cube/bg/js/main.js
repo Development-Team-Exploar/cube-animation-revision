@@ -13,6 +13,7 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
+let startEventListeners = false
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
     // adaptToDeviceRatio: true, //To be commented and versions created for performance check
@@ -206,22 +207,10 @@ const createScene = function () {
     camera.lowerBetaLimit = c;
     camera.upperBetaLimit = c;
 
-    // camera.idleRotationWaitTime = 6000;
-    // camera.panningAxis = new BABYLON.Vector3(0,0,0);
-    // camera.angularSensibilityX = 10000;
-    // camera.angularSensibilityY = 10000;
-
-    // camera.attachControl(canvas, true);
-    // camera.inputs.remove(camera.inputs.attached.mousewheel);
-
     return scene;
 };
 
 scene = createScene(); //Call the createScene function
-
-setTimeout(() => {
-    animateCube = true
-}, 1500);
 
 let animationIntervalTimer = 150
 let animationCounter = 0
@@ -268,6 +257,8 @@ let toAnimate = false
 let moveIdleTimer = null
 
 scene.onPointerDown = function (event) {
+    if(!startEventListeners)
+        return
     isMouseDown = true
     mouseX = event.clientX
     animateCube = false
@@ -316,6 +307,9 @@ function animateCubeRotation(angle, meshToAnimate) {
 }
 
 scene.onPointerUp = function () {
+    if(!startEventListeners)
+        return
+
     let toAnimateCamera = false,
         angle = 0,
         meshToAnimate = null
@@ -335,7 +329,6 @@ scene.onPointerUp = function () {
     if (!isDragging) {
 
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
-
         if (pickResult.hit && !isDragging) {
 
             if ((lastAnimatedMesh?.scaling.y.toFixed(2) <= 1.12 || lastAnimatedMesh == undefined)) {
@@ -361,9 +354,14 @@ scene.onPointerUp = function () {
                     meshToAnimate = scene.getMeshByName("image cube_primitive2")
                     toAnimateCamera = true
                     angle = 3 * Math.PI / 2
+                } else if (clickedMeshName === "White edge") {
+                    toAnimateCamera = false
+                    animateCubeFace = false
+                    animateCube = true
                 } else {
                     toAnimateCamera = false
                     animateCubeFace = false
+                    animateCube = true
                 }
 
                 if (toAnimateCamera) {
@@ -374,7 +372,6 @@ scene.onPointerUp = function () {
             } else {
                 // if(lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
                 if (lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
-                    console.log('animate out inside pick');
                     animateCubeFace = true
                     tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
                         .to({
@@ -440,6 +437,9 @@ function idlBehav() {
 
 
 scene.onPointerMove = function (event) {
+    if(!startEventListeners)
+        return
+
     if (!isDragging && (gsapAnimateCompletion == true)) {
         clearTimeout(moveIdleTimer)
         moveIdleTimer = setTimeout(idlBehav, 1000);
@@ -552,3 +552,8 @@ const checkObjectSizePositions = () => {
 }
 
 window.addEventListener('resize', checkObjectSizePositions)
+
+setTimeout(() => {
+    animateCube = true
+    startEventListeners = true
+}, 1000);
