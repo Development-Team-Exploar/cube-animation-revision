@@ -1,18 +1,30 @@
+
+// Code changed 29-08-22 by Sourabh
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+
+// Code changed 29-08-22 by Sourabh
 const checkMobile = () => {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         // true for mobile device
         document.body.classList.add('isMobile')
     } else {
         document.body.classList.remove('isMobile')
+        if (sizes.width / sizes.height >= 1) {
+            document.body.classList.add('landscape')
+        } else if (sizes.width / sizes.height <= 1) {
+            document.body.classList.add('portrait')
+        }
     }
 }
 
 checkMobile()
 
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
+// Code changed 29-08-22 by Sourabh ends
+
 let startEventListeners = false
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
@@ -53,10 +65,7 @@ const createScene = function () {
     let loaderTimer = null, babylonLoader = null
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-    // scene.background = transparent
-    //scene.createDefaultCamera(true);
     scene.environmentIntensity = 1;
-    //BABYLON.MeshBuilder.CreateBox("box", {});
 
     //load Modelf
     //Name the scene loader for babylon -- Sourabh for Loader
@@ -68,9 +77,6 @@ const createScene = function () {
         });
 
         gl.intensity = 1.25;
-
-        // gl.intensity = 0;
-        // gl2.intensity = 0;
 
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
@@ -155,6 +161,7 @@ const createScene = function () {
         let frontImg = new BABYLON.Texture("./assets/front-img.jpg", scene, false, false);
         rightImg = new BABYLON.VideoTexture("video", "./assets/right-video.mp4", scene, false, false);
         rightImg.video.muted = true;
+        rightImg.video.pause()
         rightImg.fl;
         //rightImg.uScale = -1
         //rightImg.vScale = -1
@@ -182,16 +189,22 @@ const createScene = function () {
         scene.getMaterialByName('Material.008')._albedoTexture = backImg;
         scene.getMaterialByName('Material.008').roughness = 0.15
 
+        // Code changed 29-08-22 by Sourabh
         //check device orientation
         if (document.body.classList.contains('isMobile')) {
             if (sizes.width / sizes.height >= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
             }
+        }else {
+            if (sizes.width / sizes.height >= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
+            } else if (sizes.width / sizes.height <= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+            }
         }
+        // Code changed 29-08-22 by Sourabh ends
     });
 
 
@@ -220,7 +233,6 @@ let totalAnimCount = 0
 
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
-    // console.log(engine.getDeltaTime());
     TWEEN.update();
 
     if (cubeModel && animateCube) {
@@ -231,7 +243,6 @@ engine.runRenderLoop(function () {
             idlBehav()
         }, 500);
     }
-    // console.log(gsapAnimateCompletion);
 
     scene.render();
 });
@@ -265,7 +276,6 @@ scene.onPointerDown = function (event) {
 }
 
 function animateCubeRotation(angle, meshToAnimate) {
-    console.log('animate in');
     animateCube = false
     clearTimeout(autoRotateTimeout)
     pointerUpAnimating = true
@@ -316,22 +326,28 @@ scene.onPointerUp = function () {
 
     isMouseDown = false
 
+    // Code changed 29-08-22 by Sourabh
     if (document.body.classList.contains('isMobile')) {
         isDragging = false
     } else {
-        if (isDragging) {
-            setTimeout(() => {
-                isDragging = false
-            }, 5);
+        if(document.body.classList.contains('portrait')) {
+            isDragging = false
+        }else {
+            if (isDragging) {
+                setTimeout(() => {
+                    isDragging = false
+                }, 3);
+            }
         }
     }
+    // Code changed 29-08-22 by Sourabh ends
 
     if (!isDragging) {
 
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
         if (pickResult.hit && !isDragging) {
 
-            if ((lastAnimatedMesh?.scaling.y.toFixed(2) <= 1.12 || lastAnimatedMesh == undefined)) {
+            if ((lastAnimatedMesh?.scaling.y.toFixed(1) == 1.0 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
                 animateCubeFace = true
                 toAnimate = true
@@ -370,7 +386,6 @@ scene.onPointerUp = function () {
                     lastAnimatedMesh = meshToAnimate
                 }
             } else {
-                // if(lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
                 if (lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
                     animateCubeFace = true
                     tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
@@ -384,7 +399,6 @@ scene.onPointerUp = function () {
                     tweenAnimation.onComplete(() => {
                         autoRotateTimeout = setTimeout(() => {
                             if (lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
-                                console.log(lastAnimatedMesh?.scaling.y.toFixed(2));
                                 animateCube = true
                                 rightImg.video.muted = true
                                 rightImg.video.currentTime = 0
@@ -399,7 +413,6 @@ scene.onPointerUp = function () {
 
         } else {
             if ((lastAnimatedMesh?.scaling?.y != 1) && lastAnimatedMesh != undefined) {
-                console.log('animate out outside pick');
                 animateCubeFace = true
                 tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
                     .to({
@@ -430,7 +443,7 @@ scene.onPointerUp = function () {
 
 function idlBehav() {
     if ((lastAnimatedMesh?.scaling?.y == 1 || lastAnimatedMesh?.scaling?.y == undefined) && (gsapAnimateCompletion == true)) {
-        console.log('start');
+        console.log('start autorotation',lastAnimatedMesh?.scaling?.y, gsapAnimateCompletion);
         animateCube = true
     }
 }
@@ -439,11 +452,6 @@ function idlBehav() {
 scene.onPointerMove = function (event) {
     if(!startEventListeners)
         return
-
-    if (!isDragging && (gsapAnimateCompletion == true)) {
-        clearTimeout(moveIdleTimer)
-        moveIdleTimer = setTimeout(idlBehav, 1000);
-    }
 
     if (isMouseDown) {
         // clearTimeout(autoRotateTimeout)
@@ -546,7 +554,13 @@ const checkObjectSizePositions = () => {
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
             }
         } else {
-            scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
+            // Code changed 29-08-22 by Sourabh
+            if (sizes.width / sizes.height >= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
+            } else if (sizes.width / sizes.height <= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+            }
+            // Code changed 29-08-22 by Sourabh ends
         }
     }
 }
