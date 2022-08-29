@@ -1,11 +1,10 @@
 
 #renderCanvas {
-  position: absolute;
   top: 0;
   left: 0;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
+  width: 100%;
+  height: 100%;
+  outline: none;
 }
 
 body {
@@ -26,16 +25,8 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    // width: 800px;
-    // margin: 0 auto;
-    // background: url("../assets/glb/Gray\ _BG.jpeg") no-repeat;
-    // background-size: cover;
-    // background: #0F2D4C ;
-    // background: linear-gradient(180deg, rgb(0, 0, 0) 40%, #0F2D4C 100%);
-    // background: transparent;
     background: #0F2D4C ;
     background: linear-gradient(180deg, rgb(0, 0, 0) 40%, #0F2D4C 100%);
-    overflow: hidden;
   
     #light-bulb {
       position: absolute;

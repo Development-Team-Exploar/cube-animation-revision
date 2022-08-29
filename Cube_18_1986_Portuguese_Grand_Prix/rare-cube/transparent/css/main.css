@@ -1,11 +1,9 @@
 #renderCanvas {
-  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  -ms-touch-action: none;
-      touch-action: none;
+  outline: none;
 }
 
 body {
@@ -27,7 +25,6 @@ body::-webkit-scrollbar {
   width: 100%;
   height: 100%;
   background: transparent;
-  overflow: hidden;
 }
 
 #bgContainer #light-bulb {

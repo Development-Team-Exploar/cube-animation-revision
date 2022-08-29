@@ -572,6 +572,10 @@ const checkObjectSizePositions = () => {
 window.addEventListener('resize', checkObjectSizePositions)
 
 setTimeout(() => {
+    // Code added 29-08-22 by Sourabh
+    document.getElementById('renderCanvas').removeAttribute('touch-action')
+    document.getElementById('renderCanvas').style.touchAction = 'unset'
+    // Code added 29-08-22 by Sourabh
     animateCube = true
     startEventListeners = true
 }, 1000);
