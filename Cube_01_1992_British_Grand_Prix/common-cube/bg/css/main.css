@@ -1,10 +1,9 @@
 #renderCanvas {
-  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  touch-action: none;
+  outline: none;
 }
 
 body {
@@ -26,7 +25,6 @@ body::-webkit-scrollbar {
   height: 100%;
   background: #0F2D4C;
   background: linear-gradient(180deg, rgb(0, 0, 0) 40%, #0F2D4C 100%);
-  overflow: hidden;
 }
 #bgContainer #light-bulb {
   position: absolute;
