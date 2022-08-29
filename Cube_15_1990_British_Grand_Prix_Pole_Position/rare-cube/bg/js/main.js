@@ -1,18 +1,31 @@
+
+// Code changed 29-08-22 by Sourabh
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+
+// Code changed 29-08-22 by Sourabh
 const checkMobile = () => {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         // true for mobile device
         document.body.classList.add('isMobile')
     } else {
         document.body.classList.remove('isMobile')
+        if (sizes.width / sizes.height >= 1) {
+            document.body.classList.add('landscape')
+        } else if (sizes.width / sizes.height <= 1) {
+            document.body.classList.add('portrait')
+        }
     }
 }
 
 checkMobile()
 
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
+// Code changed 29-08-22 by Sourabh ends
+
+let startEventListeners = false
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
     // adaptToDeviceRatio: true, //To be commented and versions created for performance check
@@ -53,10 +66,7 @@ const createScene = function () {
     let loaderTimer = null, babylonLoader = null
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-    // scene.background = transparent
-    //scene.createDefaultCamera(true);
     scene.environmentIntensity = 1;
-    //BABYLON.MeshBuilder.CreateBox("box", {});
 
     //load Modelf
     //Name the scene loader for babylon -- Sourabh for Loader
@@ -68,9 +78,6 @@ const createScene = function () {
         });
 
         gl.intensity = 1.25;
-
-        // gl.intensity = 0;
-        // gl2.intensity = 0;
 
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
@@ -185,6 +192,7 @@ const createScene = function () {
         let frontImg = new BABYLON.Texture("./assets/front-img.jpg", scene, false, false);
         rightImg = new BABYLON.VideoTexture("video", "./assets/right-video.mp4", scene, false, false);
         rightImg.video.muted = true;
+        rightImg.video.pause()
         rightImg.fl;
         //rightImg.uScale = -1
         //rightImg.vScale = -1
@@ -212,16 +220,22 @@ const createScene = function () {
         scene.getMaterialByName('Material.008')._albedoTexture = backImg;
         scene.getMaterialByName('Material.008').roughness = 0.15
 
+        // Code changed 29-08-22 by Sourabh
         //check device orientation
         if (document.body.classList.contains('isMobile')) {
             if (sizes.width / sizes.height >= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
             }
+        } else {
+            if (sizes.width / sizes.height >= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
+            } else if (sizes.width / sizes.height <= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+            }
         }
+        // Code changed 29-08-22 by Sourabh ends
     });
 
 
@@ -237,22 +251,11 @@ const createScene = function () {
     camera.lowerBetaLimit = c;
     camera.upperBetaLimit = c;
 
-    // camera.idleRotationWaitTime = 6000;
-    // camera.panningAxis = new BABYLON.Vector3(0,0,0);
-    // camera.angularSensibilityX = 10000;
-    // camera.angularSensibilityY = 10000;
-
-    // camera.attachControl(canvas, true);
-    // camera.inputs.remove(camera.inputs.attached.mousewheel);
-
     return scene;
 };
 
 scene = createScene(); //Call the createScene function
 
-setTimeout(() => {
-    animateCube = true
-}, 1500);
 
 let animationIntervalTimer = 150
 let animationCounter = 0
@@ -262,7 +265,6 @@ let totalAnimCount = 0
 
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
-
     TWEEN.update();
 
     if (cubeModel && animateCube) {
@@ -273,7 +275,6 @@ engine.runRenderLoop(function () {
             idlBehav()
         }, 500);
     }
-
 
     scene.render();
 });
@@ -299,13 +300,14 @@ let toAnimate = false
 let moveIdleTimer = null
 
 scene.onPointerDown = function (event) {
+    if (!startEventListeners)
+        return
     isMouseDown = true
     mouseX = event.clientX
     animateCube = false
 }
 
 function animateCubeRotation(angle, meshToAnimate) {
-
     animateCube = false
     clearTimeout(autoRotateTimeout)
     pointerUpAnimating = true
@@ -345,23 +347,30 @@ function animateCubeRotation(angle, meshToAnimate) {
         }, 250);
     })
 }
-
 scene.onPointerUp = function () {
+    if (!startEventListeners)
+        return
     let toAnimateCamera = false,
         angle = 0,
         meshToAnimate = null
 
     isMouseDown = false
 
+    // Code changed 29-08-22 by Sourabh
     if (document.body.classList.contains('isMobile')) {
         isDragging = false
     } else {
-        if (isDragging) {
-            setTimeout(() => {
-                isDragging = false
-            }, 5);
+        if (document.body.classList.contains('portrait')) {
+            isDragging = false
+        } else {
+            if (isDragging) {
+                setTimeout(() => {
+                    isDragging = false
+                }, 3);
+            }
         }
     }
+    // Code changed 29-08-22 by Sourabh ends
 
     if (!isDragging) {
 
@@ -369,7 +378,7 @@ scene.onPointerUp = function () {
 
         if (pickResult.hit && !isDragging) {
 
-            if ((lastAnimatedMesh?.scaling.y.toFixed(2) <= 1.12 || lastAnimatedMesh == undefined)) {
+            if ((lastAnimatedMesh?.scaling.y.toFixed(1) == 1.0 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
                 animateCubeFace = true
                 toAnimate = true
@@ -392,9 +401,14 @@ scene.onPointerUp = function () {
                     meshToAnimate = scene.getMeshByName("image cube_primitive2")
                     toAnimateCamera = true
                     angle = 3 * Math.PI / 2
+                } else if (clickedMeshName === "White edge") {
+                    toAnimateCamera = false
+                    animateCubeFace = false
+                    animateCube = true
                 } else {
                     toAnimateCamera = false
                     animateCubeFace = false
+                    animateCube = true
                 }
 
                 if (toAnimateCamera) {
@@ -403,7 +417,7 @@ scene.onPointerUp = function () {
                     lastAnimatedMesh = meshToAnimate
                 }
             } else {
-                // if(lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
+
                 if (lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
 
                     animateCubeFace = true
@@ -471,10 +485,8 @@ function idlBehav() {
 
 
 scene.onPointerMove = function (event) {
-    if (!isDragging && (gsapAnimateCompletion == true)) {
-        clearTimeout(moveIdleTimer)
-        moveIdleTimer = setTimeout(idlBehav, 1000);
-    }
+    if (!startEventListeners)
+        return
 
     if (isMouseDown) {
         // clearTimeout(autoRotateTimeout)
@@ -577,9 +589,20 @@ const checkObjectSizePositions = () => {
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
             }
         } else {
-            scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
+            // Code changed 29-08-22 by Sourabh
+            if (sizes.width / sizes.height >= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
+            } else if (sizes.width / sizes.height <= 1) {
+                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+            }
+            // Code changed 29-08-22 by Sourabh ends
         }
     }
 }
 
 window.addEventListener('resize', checkObjectSizePositions)
+
+setTimeout(() => {
+    animateCube = true
+    startEventListeners = true
+}, 1000);

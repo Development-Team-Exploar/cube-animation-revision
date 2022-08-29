@@ -197,7 +197,7 @@ const createScene = function () {
             } else if (sizes.width / sizes.height <= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
             }
-        }else {
+        } else {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
@@ -268,7 +268,7 @@ let toAnimate = false
 let moveIdleTimer = null
 
 scene.onPointerDown = function (event) {
-    if(!startEventListeners)
+    if (!startEventListeners)
         return
     isMouseDown = true
     mouseX = event.clientX
@@ -315,11 +315,9 @@ function animateCubeRotation(angle, meshToAnimate) {
         }, 250);
     })
 }
-
 scene.onPointerUp = function () {
-    if(!startEventListeners)
+    if (!startEventListeners)
         return
-
     let toAnimateCamera = false,
         angle = 0,
         meshToAnimate = null
@@ -330,9 +328,9 @@ scene.onPointerUp = function () {
     if (document.body.classList.contains('isMobile')) {
         isDragging = false
     } else {
-        if(document.body.classList.contains('portrait')) {
+        if (document.body.classList.contains('portrait')) {
             isDragging = false
-        }else {
+        } else {
             if (isDragging) {
                 setTimeout(() => {
                     isDragging = false
@@ -345,6 +343,7 @@ scene.onPointerUp = function () {
     if (!isDragging) {
 
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+
         if (pickResult.hit && !isDragging) {
 
             if ((lastAnimatedMesh?.scaling.y.toFixed(1) == 1.0 || lastAnimatedMesh == undefined)) {
@@ -386,7 +385,9 @@ scene.onPointerUp = function () {
                     lastAnimatedMesh = meshToAnimate
                 }
             } else {
+
                 if (lastAnimatedMesh && (lastAnimatedMesh.scaling.y != 1)) {
+
                     animateCubeFace = true
                     tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
                         .to({
@@ -399,6 +400,7 @@ scene.onPointerUp = function () {
                     tweenAnimation.onComplete(() => {
                         autoRotateTimeout = setTimeout(() => {
                             if (lastAnimatedMesh?.scaling.y.toFixed(2) == 1) {
+
                                 animateCube = true
                                 rightImg.video.muted = true
                                 rightImg.video.currentTime = 0
@@ -413,6 +415,7 @@ scene.onPointerUp = function () {
 
         } else {
             if ((lastAnimatedMesh?.scaling?.y != 1) && lastAnimatedMesh != undefined) {
+
                 animateCubeFace = true
                 tweenAnimation = new TWEEN.Tween(lastAnimatedMesh.scaling)
                     .to({
@@ -443,14 +446,14 @@ scene.onPointerUp = function () {
 
 function idlBehav() {
     if ((lastAnimatedMesh?.scaling?.y == 1 || lastAnimatedMesh?.scaling?.y == undefined) && (gsapAnimateCompletion == true)) {
-        console.log('start autorotation',lastAnimatedMesh?.scaling?.y, gsapAnimateCompletion);
+
         animateCube = true
     }
 }
 
 
 scene.onPointerMove = function (event) {
-    if(!startEventListeners)
+    if (!startEventListeners)
         return
 
     if (isMouseDown) {
