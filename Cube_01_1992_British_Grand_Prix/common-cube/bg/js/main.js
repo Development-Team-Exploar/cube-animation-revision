@@ -1,23 +1,24 @@
 
-// Code changed 29-08-22 by Sourabh
+// Code changed 06-09-22 by Sourabh
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
 
 
-// Code changed 29-08-22 by Sourabh
+// Code changed 06-09-22 by Sourabh
 const checkMobile = () => {
+    let isIpad = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+    if(isIpad) {
+        document.body.classList.add('iPad')
+    }else {
+        document.body.classList.remove('iPad')
+    }
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         // true for mobile device
         document.body.classList.add('isMobile')
     } else {
         document.body.classList.remove('isMobile')
-        if (sizes.width / sizes.height >= 1) {
-            document.body.classList.add('landscape')
-        } else if (sizes.width / sizes.height <= 1) {
-            document.body.classList.add('portrait')
-        }
     }
 }
 
@@ -201,7 +202,12 @@ const createScene = function () {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }
             }
         }
         // Code changed 29-08-22 by Sourabh ends
@@ -324,11 +330,12 @@ scene.onPointerUp = function () {
 
     isMouseDown = false
 
-    // Code changed 29-08-22 by Sourabh
+    // Code changed 
+                // Code changed 06-09-22 by Sourabh by Sourabh
     if (document.body.classList.contains('isMobile')) {
         isDragging = false
     } else {
-        if (document.body.classList.contains('portrait')) {
+        if (document.body.classList.contains('iPad')) {
             isDragging = false
         } else {
             if (isDragging) {
@@ -547,24 +554,27 @@ const checkObjectSizePositions = () => {
     engine.resize();
 
     if (scene != null && cubeModel != null) {
+        
+        // Code changed 06-09-22 by Sourabh
         if (document.body.classList.contains('isMobile')) {
-
             if (sizes.width / sizes.height >= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
             }
         } else {
-            // Code changed 29-08-22 by Sourabh
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }
             }
-            // Code changed 29-08-22 by Sourabh ends
         }
+        // Code changed 06-09-22 by Sourabh ends
     }
 }
 
