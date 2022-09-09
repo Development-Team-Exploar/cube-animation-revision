@@ -55,7 +55,7 @@ checkMobile()
 let startEventListeners = false
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
-    // adaptToDeviceRatio: true, //To be commented and versions created for performance check
+    adaptToDeviceRatio: true, //To be commented and versions created for performance check
     antialias: true
 }); // Generate the BABYLON 3D engine
 
@@ -96,10 +96,10 @@ const createScene = function () {
 
     //load Modelf
     //Name the scene loader for babylon -- Sourabh for Loader
-    babylonLoader = BABYLON.SceneLoader.Append("./assets/", "normal-cube.glb", scene, function (meshes) {
+    babylonLoader = BABYLON.SceneLoader.Append("./assets/", "cube_common_with_icons_02.glb", scene, function (meshes) {
 
         gl = new BABYLON.GlowLayer("glow", scene, {
-            mainTextureSamples: 16,
+            mainTextureSamples: 8,
             blurKernelSize: 280
         });
 
@@ -120,7 +120,14 @@ const createScene = function () {
             }
         }
         scene.meshes.forEach(element => {
-            if (element.name == 'front' || element.name == 'Right' || element.name == 'back' || element.name == 'left') {
+            if(element.name == 'image cube.001' || element.name == 'Cube_primitive0' || element.name == 'Cube_primitive1') {
+                element.isPickable = false
+            }
+            if(element.name == 'magnifying-glass' || element.name == 'play-button') {
+                element.scaling = new BABYLON.Vector3(-.15, .15, .15);
+            }
+            
+            if (element.name == 'front' || element.name == 'magnifying-glass' || element.name == 'back' || element.name == 'play-button') {
                 if (element.name == 'front') {
                     const data = {
                         'clickable': element,
@@ -128,7 +135,7 @@ const createScene = function () {
                     }
                     clickableMeshes.push(data)
                 }
-                if (element.name == 'Right') {
+                if (element.name == 'magnifying-glass') {
                     const data = {
                         'clickable': element,
                         'actor': scene.getMeshByName("image cube_primitive0")
@@ -142,7 +149,7 @@ const createScene = function () {
                     }
                     clickableMeshes.push(data)
                 }
-                if (element.name == 'left') {
+                if (element.name == 'play-button') {
                     const data = {
                         'clickable': element,
                         'actor': scene.getMeshByName("image cube_primitive2")
@@ -378,27 +385,18 @@ scene.onPointerUp = function () {
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
         if (pickResult.hit && !isDragging) {
-
             if ((lastAnimatedMesh?.scaling.y.toFixed(1) == 1.0 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
                 animateCubeFace = true
                 toAnimate = true
-                if (clickedMeshName === "front") {//front panel
-                    meshToAnimate = scene.getMeshByName("image cube_primitive1")
-                    toAnimateCamera = true
-                    angle = 0
-                } else if (clickedMeshName === "Right") {//right panel
+                if (clickedMeshName === "play-button") {//right panel Video plane
                     meshToAnimate = scene.getMeshByName("image cube_primitive0")
                     toAnimateCamera = true
                     angle = Math.PI / 2
                     rightImg.video.currentTime = 0
                     rightImg.video.muted = false
                     rightImg.video.play();
-                } else if (clickedMeshName === "back") {//back panel
-                    meshToAnimate = scene.getMeshByName("image cube_primitive3")
-                    toAnimateCamera = true
-                    angle = Math.PI
-                } else if (clickedMeshName === "left") {//left panel
+                } else if (clickedMeshName === "magnifying-glass") {//left panel Main image
                     meshToAnimate = scene.getMeshByName("image cube_primitive2")
                     toAnimateCamera = true
                     angle = 3 * Math.PI / 2
@@ -540,8 +538,8 @@ scene.onPointerMove = function (event) {
                 if (selectedMesh != null) {
                     if (clickedMeshName === selectedMesh.clickable.name) {
                         gl.customEmissiveColorSelector = function (element, subMesh, material, result) {
-                            if (element.name == selectedMesh.actor.name) {
-                                result.set(0.18, 0.35, 0.35, 0);
+                            if (element.name == selectedMesh.clickable.name) {
+                                result.set(0, 0.6, 0.6, 5000);
                             } else if (element.name === "White edge") {
                                 result.set(1, 1, 1, 1);
                             } else if (element.name === "Green edge") {
@@ -549,6 +547,16 @@ scene.onPointerMove = function (event) {
                             } else {
                                 result.set(0, 0, 0, 0);
                             }
+                        }
+                    }
+                }else {
+                    gl.customEmissiveColorSelector = function (element, subMesh, material, result) {
+                        if (element.name === "White edge") {
+                            result.set(1, 1, 1, 1);
+                        } else if (element.name === "Green edge") {
+                            result.set(0, 1, 1, .5);
+                        } else {
+                            result.set(0, 0, 0, 0);
                         }
                     }
                 }
@@ -586,7 +594,12 @@ const checkObjectSizePositions = () => {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                }
             }
         } else {
             if (sizes.width / sizes.height >= 1) {

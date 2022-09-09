@@ -1,23 +1,50 @@
 
-// Code changed 29-08-22 by Sourabh
+// Code changed 06-09-22 by Sourabh
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
 
 
-// Code changed 29-08-22 by Sourabh
+const isIpadOS = () => {
+    return navigator.maxTouchPoints &&
+      navigator.maxTouchPoints > 2 &&
+      /MacIntel/.test(navigator.platform);
+}
+
+// Code changed 06-09-22 by Sourabh
 const checkMobile = () => {
+    // alert(typeof(/Mobile/i.test(navigator.userAgent)))
+    if( /iPad|Macintosh/i.test(navigator.userAgent) ) {
+        const ipadOS = isIpadOS()
+        // some code..
+        
+        if(ipadOS) {
+            document.body.classList.add('iPad')
+            // alert('IPAD')
+        }else {
+            document.body.classList.remove('iPad')
+        }
+
+        if(/Chrome|CriOS/i.test(navigator.userAgent)) {
+            document.body.classList.add('Chrome')
+            // alert('IPAD Chrome')
+        }else {
+            document.body.classList.remove('Chrome')
+        }
+    }else {
+        // alert('ipad false')
+        document.body.classList.remove('iPad')
+    }
+    // let isIpad = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+    // if(isIpad) {
+    // }else {
+    // }
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         // true for mobile device
         document.body.classList.add('isMobile')
     } else {
         document.body.classList.remove('isMobile')
-        if (sizes.width / sizes.height >= 1) {
-            document.body.classList.add('landscape')
-        } else if (sizes.width / sizes.height <= 1) {
-            document.body.classList.add('portrait')
-        }
     }
 }
 
@@ -28,7 +55,7 @@ checkMobile()
 let startEventListeners = false
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
-    // adaptToDeviceRatio: true, //To be commented and versions created for performance check
+    adaptToDeviceRatio: true, //To be commented and versions created for performance check
     antialias: true
 }); // Generate the BABYLON 3D engine
 
@@ -65,19 +92,19 @@ let gsapAnimate = null,
 const createScene = function () {
     let loaderTimer = null, babylonLoader = null
     const scene = new BABYLON.Scene(engine);
-    scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+    scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.01);
     scene.environmentIntensity = 1;
 
     //load Modelf
     //Name the scene loader for babylon -- Sourabh for Loader
-    babylonLoader = BABYLON.SceneLoader.Append("./assets/", "rare-cube.glb", scene, function (meshes) {
+    babylonLoader = BABYLON.SceneLoader.Append("./assets/", "cube_rare_with icons_02.glb", scene, function (meshes) {
 
         gl = new BABYLON.GlowLayer("glow", scene, {
-            mainTextureSamples: 16,
+            mainTextureSamples: 8,
             blurKernelSize: 280
         });
 
-        gl.intensity = 1.25;
+        gl.intensity = 1.5;
 
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
@@ -95,6 +122,12 @@ const createScene = function () {
         }
 
         scene.meshes.forEach(element => {
+            if(element.name == 'image cube.001' || element.name == 'Cube_primitive0' || element.name == 'Cube_primitive1') {
+                element.isPickable = false
+            }
+            if(element.name == 'magnifying-glass' || element.name == 'play-button') {
+                element.scaling = new BABYLON.Vector3(-.15, .15, .15);
+            }
 
             if (element.name == 'Green edge' || element.name == 'White edge') {
                 if (element.name == 'White edge') {
@@ -123,36 +156,36 @@ const createScene = function () {
                 element.isVisible = false
 
 
-            if (element.name == 'front' || element.name == 'Right' || element.name == 'back' || element.name == 'left') {
-                if (element.name == 'front') {
-                    const data = {
-                        'clickable': element,
-                        'actor': scene.getMeshByName("image cube_primitive1")
+                if (element.name == 'front' || element.name == 'magnifying-glass' || element.name == 'back' || element.name == 'play-button') {
+                    if (element.name == 'front') {
+                        const data = {
+                            'clickable': element,
+                            'actor': scene.getMeshByName("image cube_primitive1")
+                        }
+                        clickableMeshes.push(data)
                     }
-                    clickableMeshes.push(data)
-                }
-                if (element.name == 'Right') {
-                    const data = {
-                        'clickable': element,
-                        'actor': scene.getMeshByName("image cube_primitive0")
+                    if (element.name == 'magnifying-glass') {
+                        const data = {
+                            'clickable': element,
+                            'actor': scene.getMeshByName("image cube_primitive0")
+                        }
+                        clickableMeshes.push(data)
                     }
-                    clickableMeshes.push(data)
-                }
-                if (element.name == 'back') {
-                    const data = {
-                        'clickable': element,
-                        'actor': scene.getMeshByName("image cube_primitive3")
+                    if (element.name == 'back') {
+                        const data = {
+                            'clickable': element,
+                            'actor': scene.getMeshByName("image cube_primitive3")
+                        }
+                        clickableMeshes.push(data)
                     }
-                    clickableMeshes.push(data)
-                }
-                if (element.name == 'left') {
-                    const data = {
-                        'clickable': element,
-                        'actor': scene.getMeshByName("image cube_primitive2")
+                    if (element.name == 'play-button') {
+                        const data = {
+                            'clickable': element,
+                            'actor': scene.getMeshByName("image cube_primitive2")
+                        }
+                        clickableMeshes.push(data)
                     }
-                    clickableMeshes.push(data)
                 }
-            }
 
         });
 
@@ -289,15 +322,6 @@ engine.runRenderLoop(function () {
     scene.render();
 });
 
-function toggleContentOverlay() {
-
-    leftBigImg.children[0].pause();
-
-    contentOverlay.style.opacity = 0;
-    contentOverlay.style.zIndex = -1;
-
-}
-
 
 // Mouse interactions
 
@@ -339,7 +363,7 @@ function animateCubeRotation(angle, meshToAnimate) {
         },
         {
             y: (cycles * (2 * Math.PI)) + rotateAngle,
-            duration: 2,
+            duration: 2.25,
             ease: "power2.out"
         }
     )
@@ -366,17 +390,21 @@ scene.onPointerUp = function () {
 
     isMouseDown = false
 
-    // Code changed 29-08-22 by Sourabh
+    // Code changed 
+    // Code changed 06-09-22 by Sourabh by Sourabh
     if (document.body.classList.contains('isMobile')) {
+        // alert('Pointer Up isMobile')
         isDragging = false
     } else {
-        if (document.body.classList.contains('portrait')) {
+        if (document.body.classList.contains('iPad')) {
+            // alert('Pointer Up iPad')
             isDragging = false
         } else {
+            // alert('Pointer Up Not iPad')
             if (isDragging) {
                 setTimeout(() => {
                     isDragging = false
-                }, 3);
+                }, 5);
             }
         }
     }
@@ -387,27 +415,19 @@ scene.onPointerUp = function () {
         var pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
         if (pickResult.hit && !isDragging) {
-
             if ((lastAnimatedMesh?.scaling.y.toFixed(1) == 1.0 || lastAnimatedMesh == undefined)) {
                 const clickedMeshName = pickResult.pickedMesh.name;
                 animateCubeFace = true
                 toAnimate = true
-                if (clickedMeshName === "front") {//front panel
-                    meshToAnimate = scene.getMeshByName("image cube_primitive1")
-                    toAnimateCamera = true
-                    angle = 0
-                } else if (clickedMeshName === "Right") {//right panel
+                
+                if (clickedMeshName === "play-button") {//right panel Video plane
                     meshToAnimate = scene.getMeshByName("image cube_primitive0")
                     toAnimateCamera = true
                     angle = Math.PI / 2
                     rightImg.video.currentTime = 0
                     rightImg.video.muted = false
                     rightImg.video.play();
-                } else if (clickedMeshName === "back") {//back panel
-                    meshToAnimate = scene.getMeshByName("image cube_primitive3")
-                    toAnimateCamera = true
-                    angle = Math.PI
-                } else if (clickedMeshName === "left") {//left panel
+                } else if (clickedMeshName === "magnifying-glass") {//left panel Main image
                     meshToAnimate = scene.getMeshByName("image cube_primitive2")
                     toAnimateCamera = true
                     angle = 3 * Math.PI / 2
@@ -549,8 +569,8 @@ scene.onPointerMove = function (event) {
                 if (selectedMesh != null) {
                     if (clickedMeshName === selectedMesh.clickable.name) {
                         gl.customEmissiveColorSelector = function (element, subMesh, material, result) {
-                            if (element.name == selectedMesh.actor.name) {
-                                result.set(0.17, 0.13, 0, 0);
+                            if (element.name == selectedMesh.clickable.name) {
+                                result.set(1, 0.76, 0.37, 5000);
                             } else if (element.name === "White edge") {
                                 result.set(1, 0.76, 0.35, 1);
                             } else if (element.name === "bottom") {
@@ -558,6 +578,16 @@ scene.onPointerMove = function (event) {
                             } else {
                                 result.set(0, 0, 0, 0);
                             }
+                        }
+                    }
+                }else {
+                    gl.customEmissiveColorSelector = function (element, subMesh, material, result) {
+                        if (element.name === "White edge") {
+                            result.set(1, 0.76, 0.35, 1);
+                        } else if (element.name === "bottom") {
+                            result.set(0.3, 0.19, 0, 1);
+                        } else {
+                            result.set(0, 0, 0, 0);
                         }
                     }
                 }
@@ -589,6 +619,7 @@ const checkObjectSizePositions = () => {
     engine.resize();
 
     if (scene != null && cubeModel != null) {
+        // Code changed 06-09-22 by Sourabh
         if (document.body.classList.contains('isMobile')) {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
@@ -612,6 +643,7 @@ const checkObjectSizePositions = () => {
                 }
             }
         }
+        // Code changed 06-09-22 by Sourabh ends
     }
 }
 
