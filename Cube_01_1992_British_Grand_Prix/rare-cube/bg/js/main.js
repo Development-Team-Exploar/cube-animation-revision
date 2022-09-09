@@ -226,13 +226,23 @@ const createScene = function () {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                }
             }
         } else {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }
             }
         }
         // Code changed 29-08-22 by Sourabh ends
@@ -580,22 +590,27 @@ const checkObjectSizePositions = () => {
 
     if (scene != null && cubeModel != null) {
         if (document.body.classList.contains('isMobile')) {
-
             if (sizes.width / sizes.height >= 1) {
-
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-
-                scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                }
             }
         } else {
-            // Code changed 29-08-22 by Sourabh
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }
             }
-            // Code changed 29-08-22 by Sourabh ends
         }
     }
 }

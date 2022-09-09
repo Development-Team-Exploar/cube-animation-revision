@@ -6,14 +6,40 @@ const sizes = {
 }
 
 
+const isIpadOS = () => {
+    return navigator.maxTouchPoints &&
+      navigator.maxTouchPoints > 2 &&
+      /MacIntel/.test(navigator.platform);
+}
+
 // Code changed 06-09-22 by Sourabh
 const checkMobile = () => {
-    let isIpad = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
-    if(isIpad) {
-        document.body.classList.add('iPad')
+    // alert(typeof(/Mobile/i.test(navigator.userAgent)))
+    if( /iPad|Macintosh/i.test(navigator.userAgent) ) {
+        const ipadOS = isIpadOS()
+        // some code..
+        
+        if(ipadOS) {
+            document.body.classList.add('iPad')
+            // alert('IPAD')
+        }else {
+            document.body.classList.remove('iPad')
+        }
+
+        if(/Chrome|CriOS/i.test(navigator.userAgent)) {
+            document.body.classList.add('Chrome')
+            // alert('IPAD Chrome')
+        }else {
+            document.body.classList.remove('Chrome')
+        }
     }else {
+        // alert('ipad false')
         document.body.classList.remove('iPad')
     }
+    // let isIpad = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+    // if(isIpad) {
+    // }else {
+    // }
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         // true for mobile device
         document.body.classList.add('isMobile')
@@ -65,7 +91,7 @@ let gsapAnimate = null,
 const createScene = function () {
     let loaderTimer = null, babylonLoader = null
     const scene = new BABYLON.Scene(engine);
-    scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+    scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.01);
     scene.environmentIntensity = 1;
 
     //load Modelf
@@ -77,7 +103,7 @@ const createScene = function () {
             blurKernelSize: 280
         });
 
-        gl.intensity = 1.25;
+        gl.intensity = 2;
 
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
@@ -196,7 +222,12 @@ const createScene = function () {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
-                scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                // Code changed 06-09-22 by Sourabh
+                if(document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+                }else {
+                    scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
+                }
             }
         } else {
             if (sizes.width / sizes.height >= 1) {
@@ -253,14 +284,6 @@ engine.runRenderLoop(function () {
     scene.render();
 });
 
-function toggleContentOverlay() {
-
-    leftBigImg.children[0].pause();
-
-    contentOverlay.style.opacity = 0;
-    contentOverlay.style.zIndex = -1;
-
-}
 
 
 // Mouse interactions
@@ -303,7 +326,7 @@ function animateCubeRotation(angle, meshToAnimate) {
         },
         {
             y: (cycles * (2 * Math.PI)) + rotateAngle,
-            duration: 2,
+            duration: 2.25,
             ease: "power2.out"
         }
     )
@@ -331,17 +354,20 @@ scene.onPointerUp = function () {
     isMouseDown = false
 
     // Code changed 
-                // Code changed 06-09-22 by Sourabh by Sourabh
+    // Code changed 06-09-22 by Sourabh by Sourabh
     if (document.body.classList.contains('isMobile')) {
+        // alert('Pointer Up isMobile')
         isDragging = false
     } else {
         if (document.body.classList.contains('iPad')) {
+            // alert('Pointer Up iPad')
             isDragging = false
         } else {
+            // alert('Pointer Up Not iPad')
             if (isDragging) {
                 setTimeout(() => {
                     isDragging = false
-                }, 3);
+                }, 5);
             }
         }
     }
