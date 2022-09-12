@@ -8,31 +8,31 @@ const sizes = {
 
 const isIpadOS = () => {
     return navigator.maxTouchPoints &&
-      navigator.maxTouchPoints > 2 &&
-      /MacIntel/.test(navigator.platform);
+        navigator.maxTouchPoints > 2 &&
+        /MacIntel/.test(navigator.platform);
 }
 
 // Code changed 06-09-22 by Sourabh
 const checkMobile = () => {
     // alert(typeof(/Mobile/i.test(navigator.userAgent)))
-    if( /iPad|Macintosh/i.test(navigator.userAgent) ) {
+    if (/iPad|Macintosh/i.test(navigator.userAgent)) {
         const ipadOS = isIpadOS()
         // some code..
-        
-        if(ipadOS) {
+
+        if (ipadOS) {
             document.body.classList.add('iPad')
             // alert('IPAD')
-        }else {
+        } else {
             document.body.classList.remove('iPad')
         }
 
-        if(/Chrome|CriOS/i.test(navigator.userAgent)) {
+        if (/Chrome|CriOS/i.test(navigator.userAgent)) {
             document.body.classList.add('Chrome')
             // alert('IPAD Chrome')
-        }else {
+        } else {
             document.body.classList.remove('Chrome')
         }
-    }else {
+    } else {
         // alert('ipad false')
         document.body.classList.remove('iPad')
     }
@@ -92,7 +92,7 @@ const createScene = function () {
     let loaderTimer = null, babylonLoader = null
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.01);
-    scene.environmentIntensity = 1;
+    scene.environmentIntensity = .7;
 
     //load Modelf
     //Name the scene loader for babylon -- Sourabh for Loader
@@ -103,7 +103,7 @@ const createScene = function () {
             blurKernelSize: 280
         });
 
-        gl.intensity = 2;
+        gl.intensity = 1.25;
 
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
@@ -120,13 +120,13 @@ const createScene = function () {
             }
         }
         scene.meshes.forEach(element => {
-            if(element.name == 'image cube.001' || element.name == 'Cube_primitive0' || element.name == 'Cube_primitive1') {
+            if (element.name == 'image cube.001' || element.name == 'Cube_primitive0' || element.name == 'Cube_primitive1') {
                 element.isPickable = false
             }
-            if(element.name == 'magnifying-glass' || element.name == 'play-button') {
+            if (element.name == 'magnifying-glass' || element.name == 'play-button') {
                 element.scaling = new BABYLON.Vector3(-.15, .15, .15);
             }
-            
+
             if (element.name == 'front' || element.name == 'magnifying-glass' || element.name == 'back' || element.name == 'play-button') {
                 if (element.name == 'front') {
                     const data = {
@@ -178,15 +178,11 @@ const createScene = function () {
                 element.transparencyMode = element.MATERIAL_ALPHABLEND
                 element.alphaMode = BABYLON.Engine.ALPHA_PREMULTIPLIED;
 
-            } else {
-
-                element.roughness = 0.055
-            }
-
-            if (element.name == 'Material.001') {
-                element.emissiveIntensity = 3;
-                element.metallic = 1
-                element.roughness = 0
+            } if (element.name == 'Glass' || element.name == 'Glass.001') {
+                element.roughness = 0.07
+                element._emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+                console.log(element);
+                element.environmentIntensity = 0.9
             }
         });
 
@@ -230,9 +226,9 @@ const createScene = function () {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
                 // Code changed 06-09-22 by Sourabh
-                if(document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
+                if (document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
                     scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
-                }else {
+                } else {
                     scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
                 }
             }
@@ -241,9 +237,9 @@ const createScene = function () {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
                 // Code changed 06-09-22 by Sourabh
-                if(document.body.classList.contains('iPad')) {
+                if (document.body.classList.contains('iPad')) {
                     scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
-                }else {
+                } else {
                     scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
                 }
             }
@@ -549,7 +545,7 @@ scene.onPointerMove = function (event) {
                             }
                         }
                     }
-                }else {
+                } else {
                     gl.customEmissiveColorSelector = function (element, subMesh, material, result) {
                         if (element.name === "White edge") {
                             result.set(1, 1, 1, 1);
@@ -588,16 +584,16 @@ const checkObjectSizePositions = () => {
     engine.resize();
 
     if (scene != null && cubeModel != null) {
-        
+
         // Code changed 06-09-22 by Sourabh
         if (document.body.classList.contains('isMobile')) {
             if (sizes.width / sizes.height >= 1) {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
             } else if (sizes.width / sizes.height <= 1) {
                 // Code changed 06-09-22 by Sourabh
-                if(document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
+                if (document.body.classList.contains('iPad') || document.body.classList.contains('Chrome')) {
                     scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
-                }else {
+                } else {
                     scene.meshes[0].scaling = new BABYLON.Vector3(.58, .58, .58);
                 }
             }
@@ -606,9 +602,9 @@ const checkObjectSizePositions = () => {
                 scene.meshes[0].scaling = new BABYLON.Vector3(1.025, 1.025, 1.025);
             } else if (sizes.width / sizes.height <= 1) {
                 // Code changed 06-09-22 by Sourabh
-                if(document.body.classList.contains('iPad')) {
+                if (document.body.classList.contains('iPad')) {
                     scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
-                }else {
+                } else {
                     scene.meshes[0].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
                 }
             }
