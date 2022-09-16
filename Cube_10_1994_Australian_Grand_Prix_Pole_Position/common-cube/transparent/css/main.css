@@ -10,6 +10,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Montserrat", sans-serif;
+  touch-action: none;
 }
 body::-webkit-scrollbar {
   display: none;
@@ -57,7 +58,7 @@ body::-webkit-scrollbar {
   align-items: center;
   display: flex;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.631372549);
+  background-color: transparent;
   top: 0;
   bottom: 0;
   right: 0;
