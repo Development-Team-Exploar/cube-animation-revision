@@ -101,10 +101,10 @@ const createScene = function () {
 
         gl = new BABYLON.GlowLayer("glow", scene, {
             mainTextureSamples: 8,
-            blurKernelSize: 280
+            blurKernelSize: 220
         });
 
-        gl.intensity = 1.5;
+        gl.intensity = 1.8;
 
         cubeModel = scene.meshes[0];
         cubeModel.rotationQuaternion = null
@@ -112,11 +112,12 @@ const createScene = function () {
         scene.meshes[0].position = new BABYLON.Vector3(0, -0.01, 0);
         gl.customEmissiveColorSelector = function (element, subMesh, material, result) {
             if (element.name === "White edge") {
-                result.set(1, 0.76, 0.35, 1);
+                result.set(1, 0.76, 0.35, 10);
             } else if (element.name === "bottom") {
-                result.set(0.3, 0.19, 0, 1);
-            }
-            else {
+                result.set(0.3, 0.19, 0, .025);
+            }else if (element.name === "Green edge") {
+                result.set(1, 0.76, 0.35, 1);
+            }else {
                 result.set(0, 0, 0, 0);
             }
         }
@@ -134,21 +135,24 @@ const createScene = function () {
                     // element.material.color = new BABYLON.Color3(1, 0.76, 0.35);
                     // element.material.albedoColor = new BABYLON.Color3(0, 0, 0);
                     // element.material._emissiveColor = new BABYLON.Color3(0.3, 0.19, 0);
-                    element.material._emissiveColor = new BABYLON.Color3(0, 0, 0);
-                    element.material.albedoColor = new BABYLON.Color3(0.3, 0.19, 0);
+                    element.material._emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+                    element.material.albedoColor = new BABYLON.Color3(1, 1, 1)
+                    element.material.emissiveIntensity = 1
                     // element.material._reflectivityColor = GOLDEN_COLOR;
                 }
                 if (element.name == 'Green edge') {
-                    element.material._emissiveColor = new BABYLON.Color3(0, 0, 0);
+                    element.material._emissiveColor = new BABYLON.Color3(0.3, 0.19, 0);
                     element.material.albedoColor = GOLDEN_COLOR;
+                    element.material.emissiveIntensity = 1
                 }
 
             }
             if (element.name == 'bottom') {
                 element.material.albedoColor = new BABYLON.Color3(0, 0, 0);
                 element.material._emissiveColor = new BABYLON.Color3(0.3, 0.19, 0);
-                element.material.emissiveIntensity = .9
+                element.material.emissiveIntensity = .3
                 element.material.roughness = 0
+                element.environmentIntensity = .1
             }
             if (element.name == 'concrete_floor')
                 element.isVisible = false
@@ -211,7 +215,6 @@ const createScene = function () {
             } if (element.name == 'Glass' || element.name == 'Glass.001') {
                 element.roughness = 0.07
                 element._emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-                console.log(element);
                 element.environmentIntensity = 0.9
             }
         });
