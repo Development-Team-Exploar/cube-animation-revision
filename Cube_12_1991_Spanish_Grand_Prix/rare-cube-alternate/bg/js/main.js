@@ -53,7 +53,7 @@ checkMobile()
 let startEventListeners = false
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true, {
-    // adaptToDeviceRatio: true,
+    adaptToDeviceRatio: true,
     antialias: antialias
 }); // Generate the BABYLON 3D engine
 
