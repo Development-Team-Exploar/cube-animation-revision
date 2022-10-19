@@ -10,8 +10,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Montserrat", sans-serif;
-  -ms-touch-action: none;
-      touch-action: none;
 }
 
 body::-webkit-scrollbar {
@@ -27,35 +25,6 @@ body::-webkit-scrollbar {
   width: 100%;
   height: 100%;
   background-color: transparent;
-}
-
-#bgContainer #light-bulb {
-  position: absolute;
-  top: -10%;
-  left: 0;
-  width: 80vh;
-  height: 80vh;
-  opacity: 0.4;
-  z-index: -1;
-  -webkit-transition: top 10s ease-in-out, left 10s ease-in-out;
-  transition: top 10s ease-in-out, left 10s ease-in-out;
-}
-
-#bgContainer #light-bulb:before {
-  content: '';
-  position: absolute;
-  top: 0%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  border-radius: 50%;
-  border-radius: 50%;
-  -webkit-filter: blur(30px);
-          filter: blur(30px);
-  opacity: 0.85;
-  -webkit-transition: top 10s ease-in-out, left 10s ease-in-out;
-  transition: top 10s ease-in-out, left 10s ease-in-out;
 }
 
 .loader-wrapper {
