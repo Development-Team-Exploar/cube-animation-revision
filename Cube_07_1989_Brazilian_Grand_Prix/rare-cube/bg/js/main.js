@@ -97,7 +97,7 @@ const createScene = function () {
 
     //load Modelf
     //Name the scene loader for babylon -- Sourabh for Loader
-    babylonLoader = BABYLON.SceneLoader.Append("./assets/", "cube_rare_with icons_02.glb", scene, function (meshes) {
+    babylonLoader = BABYLON.SceneLoader.Append("./assets/", "cube_common_with_icons_02.glb", scene, function (meshes) {
 
         gl = new BABYLON.GlowLayer("glow", scene, {
             mainTextureSamples: 8,
@@ -211,7 +211,6 @@ const createScene = function () {
             } if (element.name == 'Glass' || element.name == 'Glass.001') {
                 element.roughness = 0.07
                 element._emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-                console.log(element);
                 element.environmentIntensity = 0.9
             }
         });

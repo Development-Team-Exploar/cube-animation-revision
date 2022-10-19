@@ -181,7 +181,7 @@ const createScene = function () {
             } if (element.name == 'Glass' || element.name == 'Glass.001') {
                 element.roughness = 0.07
                 element._emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-                console.log(element);
+
                 element.environmentIntensity = 0.9
             }
         });
